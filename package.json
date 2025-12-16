@@ -1,0 +1,23 @@
+{
+  "name": "deccmsystem",
+  "version": "1.0.0",
+  "description": "Digital Evidence Chain of Custody Management System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "reset": "node -e \"localStorage.clear(); console.log('Local storage cleared')\""
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
