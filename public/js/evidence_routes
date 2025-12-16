@@ -1,0 +1,227 @@
+// routes/evidenceRoutes.js
+const express = require('express');
+const router = express.Router();
+const Evidence = require('../models/Evidence');
+const User = require('../models/User');
+const multer = require('multer');
+const path = require('path');
+const crypto = require('crypto');
+const fs = require('fs');
+
+// Upload storage configuration (local disk)
+const uploadsDir = path.join(__dirname, '..', 'uploads', 'evidence');
+const signaturesDir = path.join(__dirname, '..', 'uploads', 'signatures');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+if (!fs.existsSync(signaturesDir)) fs.mkdirSync(signaturesDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function(req, file, cb) {
+    const uniq = crypto.randomBytes(4).toString('hex');
+    cb(null, `EV-${Date.now()}-${uniq}-${file.originalname}`);
+  }
+});
+const upload = multer({ storage });
+
+// Helper: compute SHA256 of file at path
+function computeSHA256(filePath) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const rs = fs.createReadStream(filePath);
+    rs.on('data', (chunk) => hash.update(chunk));
+    rs.on('end', () => resolve(hash.digest('hex')));
+    rs.on('error', reject);
+  });
+}
+
+// Helper: generate evidenceId like DE-XXXX
+function generateEvidenceId() {
+  return 'DE-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+}
+
+/**
+ * POST /api/evidence/upload
+ * fields:
+ *  - evidenceFile (file)
+ *  - caseNumber, evidenceType, description, location, officerId
+ *  - signatureBase64 (optional)
+ */
+router.post('/upload', upload.single('evidenceFile'), async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+    const { caseNumber, evidenceType, description, location, officerId, officerName } = req.body;
+    const signatureBase64 = req.body.signatureBase64;
+
+    // Save signature PNG if present
+    let signaturePath = null;
+    if (signatureBase64) {
+      const name = `SIG-${Date.now()}-${crypto.randomBytes(3).toString('hex')}.png`;
+      const p = path.join(signaturesDir, name);
+      const b = Buffer.from(signatureBase64.replace(/^data:image\/\w+;base64,/, ''), 'base64');
+      fs.writeFileSync(p, b);
+      signaturePath = p;
+    }
+
+    // compute sha256
+    const sha256 = await computeSHA256(file.path);
+
+    // create evidence record
+    const evId = generateEvidenceId();
+
+    // Try to find officer to attach by id
+    let off = null;
+    if (officerId) {
+      try { off = await User.findById(officerId).lean(); } catch (e) { off = null; }
+    }
+
+    const ev = new Evidence({
+      evidenceId: evId,
+      caseNumber,
+      evidenceType,
+      description,
+      location,
+      officerId: off ? off._id : null,
+      officerName: off ? (off.fullName || off.username) : (officerName || null),
+      filePath: file.path,
+      fileName: file.originalname,
+      contentType: file.mimetype,
+      size: file.size,
+      signaturePath,
+      sha256,
+      status: 'in_custody',
+      custodyHistory: [{
+        action: 'Collected',
+        userId: off ? off._id : null,
+        from: null,
+        to: off ? off.fullName || off.username : officerName || 'Unknown',
+        timestamp: new Date(),
+        notes: 'Initial collection'
+      }],
+      timestamp: new Date()
+    });
+
+    await ev.save();
+
+    res.json({ success: true, message: 'Uploaded', evidenceId: evId, sha256 });
+  } catch (err) {
+    console.error('Upload error', err);
+    res.status(500).json({ success: false, message: 'Upload failed' });
+  }
+});
+
+// GET /api/evidence  => list (optional query: caseNumber, officerName)
+router.get('/', async (req, res) => {
+  try {
+    const q = {};
+    if (req.query.caseNumber) q.caseNumber = req.query.caseNumber;
+    if (req.query.officer) q.officerName = req.query.officer;
+    const limit = Math.min(parseInt(req.query.limit || '100', 10), 1000);
+    const items = await Evidence.find(q).sort({ timestamp: -1 }).limit(limit).lean();
+    res.json(items);
+  } catch (err) {
+    console.error('List evidence error', err);
+    res.status(500).json({ message: 'Failed to list evidence' });
+  }
+});
+
+// GET /api/evidence/my/:userId
+router.get('/my/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const items = await Evidence.find({ officerId: userId }).sort({ timestamp: -1 }).lean();
+    const totalSubmitted = items.length;
+    const currentCustody = items.filter(i => i.status === 'in_custody').length;
+    res.json({ totalSubmitted, currentCustody, items });
+  } catch (err) {
+    console.error('My evidence error', err);
+    res.status(500).json({ message: 'Failed to load my evidence' });
+  }
+});
+
+// GET /api/evidence/:id  - get by evidenceId
+router.get('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const ev = await Evidence.findOne({ evidenceId: id }).lean();
+    if (!ev) return res.status(404).json({ message: 'Evidence not found' });
+    res.json(ev);
+  } catch (err) {
+    console.error('Get evidence error', err);
+    res.status(500).json({ message: 'Failed to get evidence' });
+  }
+});
+
+// GET /api/evidence/:id/download
+router.get('/:id/download', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const ev = await Evidence.findOne({ evidenceId: id }).lean();
+    if (!ev) return res.status(404).json({ message: 'Evidence not found' });
+    if (!ev.filePath || !fs.existsSync(ev.filePath)) return res.status(404).json({ message: 'File not available' });
+
+    res.setHeader('Content-Type', ev.contentType || 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${ev.fileName || path.basename(ev.filePath)}"`);
+    res.sendFile(path.resolve(ev.filePath));
+  } catch (err) {
+    console.error('Download error', err);
+    res.status(500).json({ message: 'Download failed' });
+  }
+});
+
+// POST /api/evidence/:id/verify-hash (or /api/evidence/verify-hash using evidenceId field)
+// Accepts optional file upload to calculate hash against stored hash
+router.post('/verify-hash', multer().single('file'), async (req, res) => {
+  try {
+    const evidenceId = req.body.evidenceId || req.body.id;
+    if (!evidenceId) return res.status(400).json({ message: 'evidenceId required' });
+
+    const ev = await Evidence.findOne({ evidenceId }).lean();
+    if (!ev) return res.status(404).json({ message: 'Evidence not found' });
+
+    // If a file was uploaded for comparison
+    if (req.file && req.file.buffer) {
+      // write buffer to temp file then compute
+      const tmp = path.join(uploadsDir, `tmp-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`);
+      fs.writeFileSync(tmp, req.file.buffer);
+      const calc = await computeSHA256(tmp);
+      fs.unlinkSync(tmp);
+      res.json({ originalHash: ev.sha256, calculatedHash: calc, match: calc === ev.sha256 });
+      return;
+    }
+
+    // Otherwise compute sha256 of stored file again
+    if (!ev.filePath || !fs.existsSync(ev.filePath)) return res.status(404).json({ message: 'Stored file missing' });
+    const calc = await computeSHA256(ev.filePath);
+    res.json({ originalHash: ev.sha256, calculatedHash: calc, match: calc === ev.sha256 });
+  } catch (err) {
+    console.error('Verify error', err);
+    res.status(500).json({ message: 'Verification failed' });
+  }
+});
+
+// DELETE /api/evidence/:id  (delete record + file)
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const ev = await Evidence.findOne({ evidenceId: id });
+    if (!ev) return res.status(404).json({ message: 'Evidence not found' });
+    // delete file if exists
+    try {
+      if (ev.filePath && fs.existsSync(ev.filePath)) fs.unlinkSync(ev.filePath);
+      if (ev.signaturePath && fs.existsSync(ev.signaturePath)) fs.unlinkSync(ev.signaturePath);
+    } catch (e) {
+      console.warn('Error deleting files', e);
+    }
+    await Evidence.deleteOne({ _id: ev._id });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete evidence error', err);
+    res.status(500).json({ message: 'Delete failed' });
+  }
+});
+
+module.exports = router;
