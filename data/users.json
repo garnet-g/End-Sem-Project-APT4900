@@ -1,0 +1,18 @@
+[
+  {
+    "fullName": "Garnet Githinji",
+    "serviceId": "K-POL-111",
+    "email": "garnetgithinji@gmail.com",
+    "phoneNumber": "0748938887",
+    "userRole": "officer",
+    "station": "Kasarani"
+  },
+  {
+    "fullName": "Jeremy",
+    "serviceId": "K-POL-112",
+    "email": "jeremy123@gmail.com",
+    "phoneNumber": "011111111111",
+    "userRole": "analyst",
+    "station": "usiu"
+  }
+]
