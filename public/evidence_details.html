@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence CoC System - Details DE-1A4C</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="[dashboard_link.html]">Evidence CoC System</a>
+        <span class="navbar-text text-white">Evidence ID: **DE-1A4C**</span>
+    </div>
+</nav>
+
+<main class="container mt-4">
+    <a href="search_evidence.html" class="btn btn-sm btn-outline-secondary mb-3"><i class="bi bi-arrow-left-short"></i> Back to Search</a>
+    
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-fingerprint me-2"></i> Evidence Metadata & Integrity</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between"><strong>Case Number:</strong> <span>CR/101/2025</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><strong>Evidence Type:</strong> <span>Forensic Image (.E01)</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><strong>Size:</strong> <span>1.2 TB</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><strong>Collected By:</strong> <span>Cpl. David Ouma</span></li>
+                        <li class="list-group-item d-flex justify-content-between"><strong>Collection Location:</strong> <span>Nairobi CBD (GPS Coordinates)</span></li>
+                        <li class="list-group-item list-group-item-success d-flex justify-content-between align-items-center">
+                            <strong>Integrity Status:</strong> 
+                            <span class="fw-bold text-success"><i class="bi bi-check-circle-fill me-1"></i> VERIFIED</span>
+                        </li>
+                    </ul>
+
+                    <h6 class="mt-4">SHA-256 Hash</h6>
+                    <code class="d-block bg-light p-2 rounded small text-truncate" id="original-hash">
+                        6c8c9735a2d67d1a58e23f1b4a36f04f...
+                    </code>
+                    <p class="small text-muted mt-2">Last Verified: 2025-11-16 by Jane Doe</p>
+                    
+                    <button id="verifyHashBtn" class="btn btn-sm btn-outline-primary mt-2"><i class="bi bi-shield-check me-1"></i> Verify Hash Now</button>
+                    <a href="transfer_evidence.html?id=DE-1A4C" class="btn btn-sm btn-warning mt-2 ms-2"><i class="bi bi-repeat me-1"></i> Transfer Custody</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-7">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i> Immutable Chain of Custody</h5>
+                </div>
+                <div class="card-body">
+                    <div id="custody-timeline" class="timeline">
+                        <div class="timeline-item pb-3">
+                            <h6 class="fw-bold mb-0">Collection & Submission <span class="badge bg-primary ms-2">START</span></h6>
+                            <p class="small text-muted mb-1">2025-11-15 14:30:15</p>
+                            <p class="mb-1 small">**From:** Cpl. David Ouma (Digital Signature recorded)</p>
+                        </div>
+                        <div class="timeline-item pb-3">
+                            <h6 class="fw-bold mb-0">Transfer for Analysis</h6>
+                            <p class="small text-muted mb-1">2025-11-15 15:05:00</p>
+                            <p class="mb-1 small">**To:** Jane Doe (Forensic Analyst)</p>
+                        </div>
+                        <div class="timeline-item pb-3">
+                            <h6 class="fw-bold mb-0">Integrity Verification <span class="badge bg-success ms-2">Verified</span></h6>
+                            <p class="small text-muted mb-1">2025-11-16 09:00:00</p>
+                            <p class="mb-1 small">**Action:** Hash verified against original. No change detected.</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-info mt-3" onclick="window.print()"><i class="bi bi-printer me-1"></i> Print Chain of Custody</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3 bg-light border-top">
+    <div class="container text-center"><p class="text-muted small mb-0">Digital Evidence Chain of Custody System | &copy; 2025</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/evidence_details.js"></script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evidence CoC System - Officer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="officer_dashboard.html">
+            <img src="logo.png" alt="CoC Logo" class="me-2" style="height: 30px;">
+            Evidence CoC System
+        </a>
+        <div class="collapse navbar-collapse" id="navbarNavOfficer">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link active" href="officer_dashboard.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="upload_evidence.html"><i class="bi bi-cloud-arrow-up"></i> Upload</a></li>
+                <li class="nav-item"><a class="nav-link" href="transfer_evidence.html"><i class="bi bi-repeat"></i> Transfer</a></li>
+                <li class="nav-item"><a class="nav-link" href="search_evidence.html"><i class="bi bi-search"></i> Search</a></li>
+                <li class="nav-item"><a class="nav-link" href="my_evidence.html"><i class="bi bi-archive"></i> My Evidence</a></li>
+            </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Welcome, Cpl. Ouma (Collection Officer)
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="profile.html">Profile Management</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="index.html">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<main class="container mt-5">
+    <h1 class="mb-4 text-dark"><i class="bi bi-house-door-fill me-2"></i> Officer Dashboard</h1>
+    
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <a href="upload_evidence.html" class="btn btn-primary btn-lg w-100 py-3 shadow-sm"><i class="bi bi-cloud-arrow-up-fill me-2"></i> New Evidence Upload</a>
+        </div>
+        <div class="col-md-3">
+            <a href="transfer_evidence.html" class="btn btn-warning btn-lg w-100 py-3 shadow-sm"><i class="bi bi-repeat me-2"></i> Initiate Transfer</a>
+        </div>
+        <div class="col-md-3">
+            <a href="search_evidence.html" class="btn btn-info btn-lg w-100 py-3 shadow-sm"><i class="bi bi-search me-2"></i> Case Search</a>
+        </div>
+        <div class="col-md-3">
+            <a href="my_evidence.html" class="btn btn-secondary btn-lg w-100 py-3 shadow-sm"><i class="bi bi-qr-code me-2"></i> Scan QR Code</a>
+        </div>
+    </div>
+    
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-start border-primary border-4 h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Evidence Submitted Today</h5>
+                    <p class="card-text fs-2 fw-bold" id="stat-submitted-today">4</p>
+                    <p class="text-muted mb-0">Total items uploaded by you.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-start border-danger border-4 h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">Pending Transfers</h5>
+                    <p class="card-text fs-2 fw-bold" id="stat-pending-transfers">1</p>
+                    <p class="text-muted mb-0">Evidence awaiting collection by analyst.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-start border-success border-4 h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Total Active Cases</h5>
+                    <p class="card-text fs-2 fw-bold" id="stat-active-cases">12</p>
+                    <p class="text-muted mb-0">Cases with evidence submitted by you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header bg-light">
+            <h4 class="mb-0 text-primary"><i class="bi bi-clock-history me-2"></i> Recent Evidence Activity</h4>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th scope="col">Evidence ID</th>
+                        <th scope="col">Case No.</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-activity-table">
+                    <tr>
+                        <td>DE-2B4A</td>
+                        <td>CR/110/2025</td>
+                        <td>Mobile phone dump</td>
+                        <td><span class="badge bg-warning">Awaiting Transfer</span></td>
+                        <td><a href="transfer_evidence.html?id=DE-2B4A" class="btn btn-sm btn-warning">Transfer Now</a></td>
+                    </tr>
+                    <tr>
+                        <td>DE-9B2F</td>
+                        <td>CR/089/2025</td>
+                        <td>CCTV footage segment</td>
+                        <td><span class="badge bg-success">In Analysis</span></td>
+                        <td><a href="evidence_details.html?id=DE-9B2F" class="btn btn-sm btn-outline-primary">View Details</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<footer class="footer mt-auto py-3 bg-light border-top">
+    <div class="container text-center"><p class="text-muted small mb-0">Digital Evidence Chain of Custody System | &copy; 2025</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/officer_dashboard.js"></script>
+
+</body>
+</html>

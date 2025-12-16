@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court Presentation Mode - Case CR/101/2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-white"> <div id="court-header" class="p-3 bg-dark text-white d-flex justify-content-between align-items-center shadow-sm">
+    <h4 class="mb-0"><i class="bi bi-gavel me-2"></i> COURT PRESENTATION: CR/101/2025</h4>
+    <div class="d-flex align-items-center">
+        <span class="me-3">Evidence Item 3 of 12</span>
+        <button id="toggleDetailsBtn" class="btn btn-sm btn-outline-light me-2" title="Toggle Evidence Metadata"><i class="bi bi-info-circle"></i></button>
+        <button id="toggleFullscreenBtn" class="btn btn-sm btn-outline-light me-2" title="Full Screen (F11)"><i class="bi bi-arrows-fullscreen"></i></button>
+        <button id="exitCourtModeBtn" class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Exit Mode</button>
+    </div>
+</div>
+
+<main class="container-fluid p-4">
+    <div class="row g-3">
+        <div class="col-lg-9 order-lg-1">
+            <div id="evidence-preview-container" class="border p-3 bg-light text-center" style="min-height: 70vh;">
+                <img src="" alt="Currently Displayed Evidence" class="img-fluid" style="max-height: 65vh;">
+                <p class="mt-3 fs-5 fw-bold text-dark">Evidence ID: DE-1A4C - File: Suspect_Phone_Dump.jpg</p>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-3">
+                <button id="prevEvidenceBtn" class="btn btn-lg btn-outline-secondary"><i class="bi bi-arrow-left-short"></i> Previous</button>
+                <button id="nextEvidenceBtn" class="btn btn-lg btn-outline-secondary">Next <i class="bi bi-arrow-right-short"></i></button>
+            </div>
+        </div>
+
+        <div class="col-lg-3 order-lg-2" id="details-panel">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0 text-dark">Evidence History & Details</h6>
+                </div>
+                <div class="card-body p-3 small">
+                    <h6 class="text-primary"><i class="bi bi-box me-1"></i> Core Data</h6>
+                    <ul class="list-unstyled mb-3">
+                        <li>**Case:** CR/101/2025</li>
+                        <li>**Type:** Forensic Image</li>
+                        <li>**Date Collected:** 2025-11-15</li>
+                        <li>**Status:** <span class="badge bg-success">Court Ready</span></li>
+                    </ul>
+
+                    <h6 class="text-secondary"><i class="bi bi-chain me-1"></i> Chain of Custody Timeline</h6>
+                    <ul class="list-unstyled small">
+                        <li>**14:30:** Collected by Cpl. Ouma (Signature)</li>
+                        <li>**15:05:** Transferred to Analyst Jane Doe</li>
+                        <li>**16:00:** Integrity Verified (SHA-256 Match)</li>
+                        <li>**09:00:** Transferred to Prosecutor</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/court_presentation.js"></script>
+
+</body>
+</html>
